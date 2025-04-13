@@ -5,6 +5,9 @@ on:
     - cron: '0 11 * * *'  # Todos los días a las 6:00 a.m. Perú (11:00 UTC)
   workflow_dispatch:
 
+permissions:
+  contents: write  # Grant write permissions for pushing changes
+  
 jobs:
   generate-tasks:
     runs-on: ubuntu-latest

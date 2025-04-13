@@ -1,0 +1,45 @@
+name: 📝 Daily Task Generator
+
+on:
+  schedule:
+    - cron: '0 11 * * *'  # Todos los días a las 6:00 a.m. Perú (11:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  generate-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Generar archivo de tareas diarias
+        run: |
+          TODAY=$(date -u +'%Y-%m-%d')
+          YESTERDAY=$(date -u -d "yesterday" +'%Y-%m-%d')
+          TASKS_DIR="tasks"
+          TODAY_FILE="$TASKS_DIR/$TODAY.md"
+          YESTERDAY_FILE="$TASKS_DIR/$YESTERDAY.md"
+
+          echo "# 🗓️ Tareas para $TODAY" > "$TODAY_FILE"
+          echo "" >> "$TODAY_FILE"
+
+          if [[ -f "$YESTERDAY_FILE" ]]; then
+            PENDING=$(grep '\- \[ \]' "$YESTERDAY_FILE" || true)
+            if [[ ! -z "$PENDING" ]]; then
+              echo "## 🔁 Tareas pendientes del $YESTERDAY" >> "$TODAY_FILE"
+              echo "$PENDING" >> "$TODAY_FILE"
+              echo "" >> "$TODAY_FILE"
+            fi
+          fi
+
+          echo "## ✍️ Tareas nuevas" >> "$TODAY_FILE"
+          echo "- [ ] " >> "$TODAY_FILE"
+
+          git add "$TODAY_FILE"
+          git commit -m "chore: create daily task file for $TODAY"
+          git push

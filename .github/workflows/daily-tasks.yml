@@ -41,7 +41,6 @@ jobs:
           fi
 
           echo "## ✍️ Tareas nuevas" >> "$TODAY_FILE"
-          echo "- [ ] " >> "$TODAY_FILE"
 
           git add "$TODAY_FILE"
           git commit -m "chore: create daily task file for $TODAY"
